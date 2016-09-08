@@ -116,11 +116,9 @@ Timer t;
 
 void XKeys::OnKeyDown(uint8_t keyId)
 {
-    uint8_t i;  
-    uint16_t AuxState;  
-    Serial << F("Key down: ");
-    Serial.println(keyId,DEC);
-    Serial.println(keyId);
+    //Serial << F("Key down: ");
+    //Serial.println(keyId,DEC);
+    //Serial.println(keyId);
     
   //Key Switching
   // Program
@@ -201,21 +199,24 @@ void getBacklightFromAtem(){
  // Transition Type
  int TransitionType = AtemSwitcher.getTransitionType();
  if (TransitionType != TransitionTypeLastState) {
+      XKs.indexSetBL(MIXKEY, BL_RED, MODE_OFF);
+      XKs.indexSetBL(DIPKEY, BL_RED, MODE_OFF);
+      XKs.indexSetBL(WIPEKEY, BL_RED, MODE_OFF);
+      XKs.indexSetBL(MIXKEY, BL_BLUE, MODE_ON);
+      XKs.indexSetBL(DIPKEY, BL_BLUE, MODE_ON);
+      XKs.indexSetBL(WIPEKEY, BL_BLUE, MODE_ON);
   switch (TransitionType) {
     case 0:
       XKs.indexSetBL(MIXKEY, BL_RED, MODE_ON);
-      XKs.indexSetBL(DIPKEY, BL_RED, MODE_OFF);
-      XKs.indexSetBL(WIPEKEY, BL_RED, MODE_OFF);
+      XKs.indexSetBL(MIXKEY, BL_BLUE, MODE_OFF);
       break;
     case 1:
-      XKs.indexSetBL(MIXKEY, BL_RED, MODE_OFF);
       XKs.indexSetBL(DIPKEY, BL_RED, MODE_ON);
-      XKs.indexSetBL(WIPEKEY, BL_RED, MODE_OFF);
+      XKs.indexSetBL(DIPKEY, BL_BLUE, MODE_OFF);
       break;
     case 2:
-      XKs.indexSetBL(MIXKEY, BL_RED, MODE_OFF);
-      XKs.indexSetBL(DIPKEY, BL_RED, MODE_OFF);
       XKs.indexSetBL(WIPEKEY, BL_RED, MODE_ON);
+      XKs.indexSetBL(WIPEKEY, BL_BLUE, MODE_OFF);
       break;
    }
    TransitionTypeLastState = TransitionType;
@@ -227,8 +228,10 @@ void getBacklightFromAtem(){
  if (FTBState != FTBLastState) {
   if (FTBState == 0) {
     XKs.indexSetBL(FTBKEY, BL_RED, MODE_OFF);
+    XKs.indexSetBL(FTBKEY, BL_BLUE, MODE_ON);
   } else {
     XKs.setFlashFreq(50);
+    XKs.indexSetBL(FTBKEY, BL_BLUE, MODE_OFF);
     XKs.indexSetBL(FTBKEY, BL_RED, MODE_FLASH);
     
   }
@@ -386,11 +389,11 @@ void setup() {
   
   // Start the Ethernet, Serial (debugging) and UDP:
   Ethernet.begin(mac,ip);
-  Serial.begin(115200);
-  Serial << F("\n- - - - - - - -\nSerial Started\n");  
+  //Serial.begin(115200);
+  //Serial << F("\n- - - - - - - -\nSerial Started\n");  
    
   // Initialize a connection to the switcher:
-  AtemSwitcher.serialOutput(0x80);  // Remove or comment out this line for production code. Serial output may decrease performance!
+  //AtemSwitcher.serialOutput(0x80);  // Remove or comment out this line for production code. Serial output may decrease performance!
   AtemSwitcher.connect();
 
   // Shows free memory:  
@@ -411,7 +414,7 @@ void loop() {
     
   // If connection is gone anyway, try to reconnect:
   if (AtemSwitcher.isConnectionTimedOut())  {
-    Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
+    //Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
     AtemSwitcher.connect();
   } 
      
