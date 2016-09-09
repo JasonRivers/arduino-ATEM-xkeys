@@ -7,12 +7,15 @@
 // Including libraries: 
 #include <SPI.h>         // needed for Arduino versions later than 0018
 #include <Ethernet.h>
-#include <Streaming.h>
+#include <SD.h>
+#include "Streaming.h"
 #include "usbhid.h"
 #include "hiduniversal.h"
 #include "Usb.h"
-#include <hidxkeysrptparser.h>
+#include "hidxkeysrptparser.h"
 #include "Timer.h"
+#include "ATEM.h"
+
 
 // MAC address and IP address for this *particular* Arduino / Ethernet Shield!
 // The MAC address is printed on a label on the shield or on the back of your device
@@ -24,15 +27,14 @@ IPAddress ip(192, 168, 0, 99);              // <= SETUP!  IP address of the Ardu
 // Include ATEM library and make an instance:
 // Connect to an ATEM switcher on this address and using this local port:
 // The port number is chosen randomly among high numbers.
-#include <ATEM.h>
+
 ATEM AtemSwitcher(IPAddress(192, 168, 0, 240), 56417);  // <= SETUP (the IP address of the ATEM switcher)
 
+// SD Card
+
+const int chipSelect = 4;
 
 // XKeys Stuff
-
-uint8_t counter = 0; 
-uint8_t color = BL_BLUE;
-uint8_t mode = MODE_ON;
 
 class XKeys : public XkeysReportParser
 {
@@ -389,8 +391,21 @@ void setup() {
   
   // Start the Ethernet, Serial (debugging) and UDP:
   Ethernet.begin(mac,ip);
-  //Serial.begin(115200);
-  //Serial << F("\n- - - - - - - -\nSerial Started\n");  
+  Serial.begin(115200);
+  Serial << F("\n- - - - - - - -\nSerial Started\n");  
+
+  //Initialize SD Card
+  Serial.print("Initializing SD card...");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    
+  } else {
+    Serial.println("SD Card initialized");
+    Serial.println("Using default configuration");
+
+  }
    
   // Initialize a connection to the switcher:
   //AtemSwitcher.serialOutput(0x80);  // Remove or comment out this line for production code. Serial output may decrease performance!
@@ -398,6 +413,7 @@ void setup() {
 
   // Shows free memory:  
 //  Serial << F("freeMemory()=") << freeMemory() << "\n";
+
 // Update the LEDs every 1 second
   int tickEvent = t.every(100, getBacklightFromAtem);
 
