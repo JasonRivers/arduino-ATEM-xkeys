@@ -17,22 +17,45 @@
 #include "ATEM.h"
 
 
-// MAC address and IP address for this *particular* Arduino / Ethernet Shield!
-// The MAC address is printed on a label on the shield or on the back of your device
-// The IP address should be an available address you choose on your subnet where the switcher is also present
-byte mac[] = { 
-  0x90, 0xA2, 0xDA, 0x0D, 0x6B, 0xB9 };      // <= SETUP!  MAC address of the Arduino
-IPAddress ip(192, 168, 0, 99);              // <= SETUP!  IP address of the Arduino
+// DEBUG
+bool SERIALDEBUG = true;
 
-// Include ATEM library and make an instance:
-// Connect to an ATEM switcher on this address and using this local port:
-// The port number is chosen randomly among high numbers.
 
-ATEM AtemSwitcher(IPAddress(192, 168, 0, 240), 56417);  // <= SETUP (the IP address of the ATEM switcher)
+// Defaults
+static uint8_t default_ip[] = {     // Default IP of Arduino
+  192, 168, 0, 99 };
+uint8_t ip[4];        // IP of the Arduino
+uint8_t atem_ip[4];  // IP of the ATEM
+uint8_t mac[6];    // MAC Address of the Arduino
+
+
+
+// ATEM
+
+ATEM AtemSwitcher;
+
+// Track ATEM Features 
+
+int TransitionTypeLastState = 6; //Out of range to force an update on load
+
+bool FTBLastState;
+bool ATEMOnline=false;
+
+uint16_t AuxState;
+uint16_t ProgramInputLastState;
+uint16_t PreviewInputLastState;
+
+
+
+
 
 // SD Card
 
 const int chipSelect = 4;
+
+
+
+
 
 // XKeys Stuff
 
@@ -51,12 +74,7 @@ XKeys::XKeys() : XkeysReportParser() {}
 XKeys XKs;
 
 
-// Track ATEM Features 
-bool FTBLastState;
-int TransitionTypeLastState = 6; //Out of range to force an update on load
-uint16_t AuxState;
-uint16_t ProgramInputLastState;
-uint16_t PreviewInputLastState;
+
 
 // Keys
 
@@ -389,26 +407,63 @@ void setup() {
   XKs.init();
   resetProgramBacklight();
   
-  // Start the Ethernet, Serial (debugging) and UDP:
-  Ethernet.begin(mac,ip);
-  Serial.begin(115200);
-  Serial << F("\n- - - - - - - -\nSerial Started\n");  
+  if (SERIALDEBUG == true){
+    // Start Serial (debugging)
 
+    Serial.begin(115200);
+    Serial << F("\n- - - - - - - -\nSerial Started\n");  
+  }
+  
   //Initialize SD Card
-  Serial.print("Initializing SD card...");
-
+  if (SERIALDEBUG == true){
+    Serial.print("Initializing SD card...");
+  }
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
+    if (SERIALDEBUG == true){
+      Serial.println("Card failed, or not present");
+      Serial.println("Using default configuration");
+    }
+    
+    atem_ip[0] = 192;
+    atem_ip[1] = 168;
+    atem_ip[2] = 0;
+    atem_ip[3] = 240;
+    
+    ip[0] = default_ip[0];
+    ip[1] = default_ip[1];
+    ip[2] = default_ip[2];
+    ip[3] = default_ip[3];
     
   } else {
-    Serial.println("SD Card initialized");
-    Serial.println("Using default configuration");
-
+    if (SERIALDEBUG == true){
+      Serial.println("SD Card initialized");
+    
+    }
   }
+
+  
+  // MAC address and IP address for this *particular* Arduino / Ethernet Shield!
+  // The MAC address is printed on a label on the shield or on the back of your device
+  // The IP address should be an available address you choose on your subnet where the switcher is also present
+  byte mac[] = { 
+    0x90, 0xA2, 0xDA, 0x0D, 0x6B, 0xB9 };      // <= SETUP!  MAC address of the Arduino
+  IPAddress ip(192, 168, 0, 99);              // <= SETUP!  IP address of the Arduino
+
+  // Include ATEM library and make an instance:
+  // Connect to an ATEM switcher on this address and using this local port:
+  // The port number is chosen randomly among high numbers.
+  
+  AtemSwitcher.begin(IPAddress(atem_ip[0], atem_ip[1], atem_ip[2], atem_ip[3]), 56417);  // <= SETUP (the IP address of the ATEM switcher)
+  
+  //Start Ethernet
+  Ethernet.begin(mac,ip);
+
    
   // Initialize a connection to the switcher:
-  //AtemSwitcher.serialOutput(0x80);  // Remove or comment out this line for production code. Serial output may decrease performance!
+  if (SERIALDEBUG == true){
+    AtemSwitcher.serialOutput(0x80);  // Remove or comment out this line for production code. Serial output may decrease performance!
+  }
   AtemSwitcher.connect();
 
   // Shows free memory:  
@@ -430,7 +485,9 @@ void loop() {
     
   // If connection is gone anyway, try to reconnect:
   if (AtemSwitcher.isConnectionTimedOut())  {
-    //Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
+    if (SERIALDEBUG == true){
+      Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
+    }
     AtemSwitcher.connect();
   } 
      
