@@ -28,6 +28,9 @@ uint8_t ip[4];        // IP of the Arduino
 uint8_t atem_ip[4];  // IP of the ATEM
 uint8_t mac[6];    // MAC Address of the Arduino
 
+bool BacklightActive = true;
+bool BacklightInactive = true;
+
 
 
 // ATEM
@@ -136,9 +139,11 @@ Timer t;
 
 void XKeys::OnKeyDown(uint8_t keyId)
 {
-    //Serial << F("Key down: ");
-    //Serial.println(keyId,DEC);
-    //Serial.println(keyId);
+  if (SERIALDEBUG == true) {
+    Serial << F("Key down: ");
+    Serial.println(keyId,DEC);
+    Serial.println(keyId);
+  }
     
   //Key Switching
   // Program
@@ -203,28 +208,41 @@ void resetProgramBacklight() {
   for(uint8_t i = 0; i < 8; i++) {
     XKs.setRowBL((i + 1), BL_BLUE, MODE_OFF);
   }
-  for (uint8_t x = 0; x < sizeof(BlueLEDGroup); x++){
-          XKs.indexSetBL(BlueLEDGroup[x], BL_BLUE, MODE_ON);
-          XKs.indexSetBL(BlueLEDGroup[x], BL_RED, MODE_OFF);
-  }
-  for (uint8_t i = 0; i < sizeof(RedLEDGroup); i++){
-          XKs.indexSetBL(RedLEDGroup[i], BL_BLUE, MODE_OFF);
-          XKs.indexSetBL(RedLEDGroup[i], BL_RED, MODE_ON);
+  if (BacklightInactive == true) {
+    for (uint8_t x = 0; x < sizeof(BlueLEDGroup); x++){
+            XKs.indexSetBL(BlueLEDGroup[x], BL_BLUE, MODE_ON);
+            XKs.indexSetBL(BlueLEDGroup[x], BL_RED, MODE_OFF);
+    }
+    for (uint8_t i = 0; i < sizeof(RedLEDGroup); i++){
+            XKs.indexSetBL(RedLEDGroup[i], BL_BLUE, MODE_OFF);
+            XKs.indexSetBL(RedLEDGroup[i], BL_RED, MODE_ON);
+    }
   }
 
 }
 
 void getBacklightFromAtem(){
+
+ //Get Data
+ 
+ int TransitionType = AtemSwitcher.getTransitionType();
+ 
+ bool FTBState = AtemSwitcher.getFadeToBlackState();
+ 
+ uint16_t ProgramInput = AtemSwitcher.getProgramInput();
+ uint16_t PreviewInput = AtemSwitcher.getPreviewInput();
+ 
  
  // Transition Type
- int TransitionType = AtemSwitcher.getTransitionType();
  if (TransitionType != TransitionTypeLastState) {
       XKs.indexSetBL(MIXKEY, BL_RED, MODE_OFF);
       XKs.indexSetBL(DIPKEY, BL_RED, MODE_OFF);
       XKs.indexSetBL(WIPEKEY, BL_RED, MODE_OFF);
-      XKs.indexSetBL(MIXKEY, BL_BLUE, MODE_ON);
-      XKs.indexSetBL(DIPKEY, BL_BLUE, MODE_ON);
-      XKs.indexSetBL(WIPEKEY, BL_BLUE, MODE_ON);
+      if (BacklightInactive == true) {
+        XKs.indexSetBL(MIXKEY, BL_BLUE, MODE_ON);
+        XKs.indexSetBL(DIPKEY, BL_BLUE, MODE_ON);
+        XKs.indexSetBL(WIPEKEY, BL_BLUE, MODE_ON);
+      }
   switch (TransitionType) {
     case 0:
       XKs.indexSetBL(MIXKEY, BL_RED, MODE_ON);
@@ -243,12 +261,13 @@ void getBacklightFromAtem(){
  }
 
  //Fade To Black
- bool FTBState = AtemSwitcher.getFadeToBlackState();
 
  if (FTBState != FTBLastState) {
   if (FTBState == 0) {
     XKs.indexSetBL(FTBKEY, BL_RED, MODE_OFF);
-    XKs.indexSetBL(FTBKEY, BL_BLUE, MODE_ON);
+    if (BacklightInactive == true) {
+      XKs.indexSetBL(FTBKEY, BL_BLUE, MODE_ON);
+    }
   } else {
     XKs.setFlashFreq(50);
     XKs.indexSetBL(FTBKEY, BL_BLUE, MODE_OFF);
@@ -259,7 +278,6 @@ void getBacklightFromAtem(){
  }
 
  // Program Inputs
- uint16_t ProgramInput = AtemSwitcher.getProgramInput();
  if (ProgramInput != ProgramInputLastState) {
   XKs.indexSetBL(PROGRAM1, BL_RED, MODE_OFF);
   XKs.indexSetBL(PROGRAM2, BL_RED, MODE_OFF);
@@ -271,16 +289,18 @@ void getBacklightFromAtem(){
   XKs.indexSetBL(PROGRAM8, BL_RED, MODE_OFF);
   XKs.indexSetBL(PROGRAMCBAR, BL_RED, MODE_OFF);
   XKs.indexSetBL(PROGRAMBLK, BL_RED, MODE_OFF);
-  XKs.indexSetBL(PROGRAM1, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM2, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM3, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM4, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM5, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM6, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM7, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAM8, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAMCBAR, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PROGRAMBLK, BL_BLUE, MODE_ON);
+  if (BacklightInactive == true) {
+    XKs.indexSetBL(PROGRAM1, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM2, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM3, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM4, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM5, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM6, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM7, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAM8, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAMCBAR, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PROGRAMBLK, BL_BLUE, MODE_ON);
+  }
   switch (ProgramInput) {
     case 1:
       XKs.indexSetBL(PROGRAM1, BL_RED, MODE_ON);
@@ -327,7 +347,6 @@ void getBacklightFromAtem(){
  }
  
  // Preview Inputs
- uint16_t PreviewInput = AtemSwitcher.getPreviewInput();
  if (PreviewInput != PreviewInputLastState) {
   XKs.indexSetBL(PREVIEW1, BL_RED, MODE_OFF);
   XKs.indexSetBL(PREVIEW2, BL_RED, MODE_OFF);
@@ -339,16 +358,18 @@ void getBacklightFromAtem(){
   XKs.indexSetBL(PREVIEW8, BL_RED, MODE_OFF);
   XKs.indexSetBL(PREVIEWCBAR, BL_RED, MODE_OFF);
   XKs.indexSetBL(PREVIEWBLK, BL_RED, MODE_OFF);
-  XKs.indexSetBL(PREVIEW1, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW2, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW3, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW4, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW5, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW6, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW7, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEW8, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEWCBAR, BL_BLUE, MODE_ON);
-  XKs.indexSetBL(PREVIEWBLK, BL_BLUE, MODE_ON);
+  if (BacklightInactive == true) {
+    XKs.indexSetBL(PREVIEW1, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW2, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW3, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW4, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW5, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW6, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW7, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEW8, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEWCBAR, BL_BLUE, MODE_ON);
+    XKs.indexSetBL(PREVIEWBLK, BL_BLUE, MODE_ON);
+  }
   
   switch (PreviewInput) {
     case 1:
