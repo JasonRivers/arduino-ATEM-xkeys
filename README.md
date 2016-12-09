@@ -17,5 +17,5 @@ Libraries required:
 
 # Notes
 
-I have tested this with an X-Keys XK60 with a Black Magic ATEM Production Studio 4K running on an Arduino Mega ADKcl
+I have tested this with an X-Keys XK60 with a Black Magic ATEM Production Studio 4K running on an Arduino Mega ADK
 with Ethernet shield.
