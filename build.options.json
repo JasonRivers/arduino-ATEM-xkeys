@@ -1,0 +1,10 @@
+{
+  "builtInLibrariesFolders": "",
+  "customBuildProperties": "",
+  "fqbn": "arduino:avr:megaADK",
+  "hardwareFolders": "/opt/arduino-1.8.2/hardware",
+  "otherLibrariesFolders": "/opt/arduino-1.8.2/libraries,./libraries",
+  "runtime.ide.version": "10600",
+  "sketchLocation": "/home/jason/Desktop/arduino-ATEM-xkeys/arduino-ATEM-xkeys.ino",
+  "toolsFolders": "/opt/arduino-1.8.2/hardware/tools/avr,/opt/arduino-1.8.2/tools-builder/"
+}
