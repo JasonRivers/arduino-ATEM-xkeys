@@ -1,0 +1,13 @@
+[submodule "libraries/Timer"]
+	path = libraries/Timer
+	url = https://github.com/JChristensen/Timer
+[submodule "libraries/USB_Host_Shield_2.0"]
+	path = libraries/USB_Host_Shield_2.0
+	url = https://github.com/felis/USB_Host_Shield_2.0
+[submodule "libraries/Streaming"]
+	path = libraries/Streaming
+	url = git@github.com:JasonRivers/arduino-streaming.git
+[submodule "libraries/XKeys-Library-for-Arduino"]
+	path = libraries/XKeys-Library-for-Arduino
+	url = https://github.com/JasonRivers/XKeys-Library-for-Arduino
+	branch = USBHID-fixes
