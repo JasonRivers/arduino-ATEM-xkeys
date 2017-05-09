@@ -14,7 +14,7 @@
 #include "Usb.h"
 #include "hidxkeysrptparser.h"
 #include "Timer.h"
-#include "ATEM.h"
+#include "ATEMstd.h"
 
 
 // DEBUG
@@ -35,7 +35,7 @@ bool BacklightInactive = false;
 
 // ATEM
 
-ATEM AtemSwitcher;
+ATEMstd AtemSwitcher;
 
 // Track ATEM Features 
 
@@ -599,11 +599,11 @@ void loop() {
     t.update();
     
   // If connection is gone anyway, try to reconnect:
-  if (AtemSwitcher.isConnectionTimedOut())  {
-    if (SERIALDEBUG == true){
-      Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
-    }
-    AtemSwitcher.connect();
-  } 
+  //if (AtemSwitcher.isConnectionTimedOut())  {
+  //  if (SERIALDEBUG == true){
+  //    Serial << F("Connection to ATEM Switcher has timed out - reconnecting!\n");
+  //  }
+  //  AtemSwitcher.connect();
+  //} 
      
 }
