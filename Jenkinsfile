@@ -4,6 +4,6 @@ node('arduino') {
 		sh 'git submodule update --init'
 	}
 	stage ('build') {
-		sh 'arduino-builder -build-options-file ./build.options.json -verbose -compile ./arduino-ATEM-xkeys.ino'
+		sh 'mkdir -p build && arduino-builder -build-options-file ./build.options.json -verbose -build-path ${WORKSPACE}/build/ -compile ./arduino-ATEM-xkeys.ino'
 	}
 }
