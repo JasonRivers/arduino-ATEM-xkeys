@@ -10,10 +10,34 @@ Libraries required:
  * Timer.h :- https://github.com/JChristensen/Timer
  * Steaming.h :- http://arduiniana.org/libraries/streaming/
 
+Libraries are included in the Libraries directory through git submodules other than ATEM.h which is directly included as the Skaarhoj repository doesn't easily allow for including a single library. 
+
+# Building:
+
+Note: This will currently build for the Arduino Mega ADK and assumes that the arduino toolchain is installed to /opt/arduino-1.8.2. If you wish to build for a different device you can use the arduino IDE or adjust the build.options.json file accordingly.
+
+```sh
+# Checkout from github:
+git checkout https://github.com/JasonRivers/arduino-ATEM-xkeys.git
+
+cd arduino-ATEM-xkeys
+
+# Update Git Submodules
+
+git submodule update --init
+
+# run arduino builder
+
+arduino-builder -build-options-file ./build.options.json -verbose -compile ./arduino-ATEM-xkeys.ino
+```
+
+
 # TODO:
 
+ * Replace ATEM.h with ATEMstd.h
  * READ Settings from SD Card
  * Web Interface for configuration
+ * Make it work on the Arduino Yún or Arduino Tian for an all-in-one device.
 
 # Notes
 
