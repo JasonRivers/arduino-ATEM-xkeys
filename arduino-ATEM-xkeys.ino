@@ -19,6 +19,8 @@
 
 // DEBUG
 bool SERIALDEBUG = true;
+bool DEBUGONLY = true;
+bool SDCARD = false;
 
 
 // Defaults
@@ -531,12 +533,39 @@ void setup() {
   
   //Initialize SD Card
   if (SERIALDEBUG == true){
-    Serial.print("Initializing SD card...");
+    Serial.println("Initializing SD card...");
   }
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     if (SERIALDEBUG == true){
       Serial.println("Card failed, or not present");
+    }
+    SDCARD = false;
+    
+    
+  } else {
+    if (SERIALDEBUG == true){
+      Serial.println("SD Card found");
+      Serial.println("Checking for atemconfig.txt");
+      
+    }
+    if (SD.exists("atemconfig.txt")) {
+      if (SERIALDEBUG == true){
+        Serial.println("found atemconfig.txt");
+      }
+      SDCARD = true;
+    } else {
+      if (SERIALDEBUG == true){
+        Serial.println("atemconfig.txt not found");
+      }
+      SDCARD = false;
+    }
+  }
+
+
+
+  if (SDCARD == false) {
+    if (SERIALDEBUG == true){
       Serial.println("Using default configuration");
     }
     
@@ -549,12 +578,6 @@ void setup() {
     ip[1] = default_ip[1];
     ip[2] = default_ip[2];
     ip[3] = default_ip[3];
-    
-  } else {
-    if (SERIALDEBUG == true){
-      Serial.println("SD Card initialized");
-    
-    }
   }
 
   
