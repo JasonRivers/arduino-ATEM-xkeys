@@ -95,6 +95,11 @@ uint8_t TRANSKEY = 55;
 uint8_t CUTKEY = 47;
 uint8_t TRANSPREV = 39;
 
+//Upstream keys
+uint8_t UPSTREAM1_KEY = 49;
+uint8_t UPSTREAM1_ONAIR = 48;
+uint8_t UPSTREAM_BKGD = 41;
+
 // Program Control
 uint8_t PROGRAM1 = 67;
 uint8_t PROGRAM2 = 75;
@@ -206,7 +211,23 @@ void XKeys::OnKeyDown(uint8_t keyId)
   //else if (keyId == AUXINPUT6) {AtemSwitcher.changeAuxState(1,6);}
   //else if (keyId == AUXINPUT7) {AtemSwitcher.changeAuxState(1,7);}
   //else if (keyId == AUXINPUT8) {AtemSwitcher.changeAuxState(1,8);}
- 
+  
+  // Upstream Keyers
+  else if (keyId == UPSTREAM1_KEY) {
+    if (AtemSwitcher.getUpstreamKeyerOnNextTransitionStatus(1)){
+      AtemSwitcher.changeUpstreamKeyNextTransition(1, 0);
+    } else {
+      AtemSwitcher.changeUpstreamKeyNextTransition(1, 1);
+    }
+  }
+  else if (keyId == UPSTREAM1_ONAIR) {
+    if (AtemSwitcher.getUpstreamKeyerStatus(1)){
+      AtemSwitcher.changeUpstreamKeyOn(1, 0);
+    } else {
+      AtemSwitcher.changeUpstreamKeyOn(1, 1);
+    }
+  }
+  
   // Fade To Black
   else if (keyId == FTBKEY) {AtemSwitcher.fadeToBlackActivate();}
   // Transition Styles
@@ -266,7 +287,31 @@ void getBacklightFromAtem(){
  bool TransitionPreview = AtemSwitcher.getTransitionPreview();
  uint16_t ProgramInput = AtemSwitcher.getProgramInput();
  uint16_t PreviewInput = AtemSwitcher.getPreviewInput();
+ bool Upstream1 = AtemSwitcher.getUpstreamKeyerOnNextTransitionStatus(1);
+ bool Upstream1_OnAir = AtemSwitcher.getUpstreamKeyerStatus(1);
+ bool Upstream_Bkgd = AtemSwitcher.getUpstreamKeyerOnNextTransitionStatus(0);
  
+ //Upstream Keys
+ if (Upstream1) {
+  XKs.indexSetBL(UPSTREAM1_KEY, BL_RED, MODE_ON);
+ } else {
+  XKs.indexSetBL(UPSTREAM1_KEY, BL_RED, MODE_OFF);
+ }
+  if (Upstream1_OnAir) {
+  XKs.indexSetBL(UPSTREAM1_ONAIR, BL_RED, MODE_ON);
+ } else {
+  XKs.indexSetBL(UPSTREAM1_ONAIR, BL_RED, MODE_OFF);
+ }
+ if (Upstream1_OnAir) {
+  XKs.indexSetBL(UPSTREAM1_ONAIR, BL_RED, MODE_ON);
+ } else {
+  XKs.indexSetBL(UPSTREAM1_ONAIR, BL_RED, MODE_OFF);
+ }
+ if (Upstream_Bkgd) {
+  XKs.indexSetBL(UPSTREAM_BKGD, BL_RED, MODE_ON);
+ } else {
+  XKs.indexSetBL(UPSTREAM_BKGD, BL_RED, MODE_OFF);
+ }
  
  // Transition Type
  if (TransitionType != TransitionTypeLastState) {
