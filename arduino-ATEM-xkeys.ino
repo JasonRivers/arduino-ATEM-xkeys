@@ -227,6 +227,13 @@ void XKeys::OnKeyDown(uint8_t keyId)
       AtemSwitcher.changeUpstreamKeyOn(1, 1);
     }
   }
+  else if (keyId == UPSTREAM_BKGD) {
+    if (AtemSwitcher.getUpstreamKeyerOnNextTransitionStatus(0)){
+      AtemSwitcher.changeUpstreamKeyNextTransition(0, 0);
+    } else {
+      AtemSwitcher.changeUpstreamKeyNextTransition(0, 1);
+    }
+  }
   
   // Fade To Black
   else if (keyId == FTBKEY) {AtemSwitcher.fadeToBlackActivate();}
